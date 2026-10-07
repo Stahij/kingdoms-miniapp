@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Kingdoms</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <div class="title">⚔️ KINGDOMS</div>
+      <div class="subtitle" id="welcome">Твоё королевство</div>
+    </div>
+    <button id="menuBtn">☰</button>
+  </header>
+
+  <section class="resources">
+    <div>🌾 <b id="food">1000</b></div>
+    <div>🪵 <b id="wood">800</b></div>
+    <div>🪨 <b id="stone">500</b></div>
+    <div>💰 <b id="gold">300</b></div>
+  </section>
+
+  <main id="game">
+    <canvas id="map"></canvas>
+    <div id="info" class="panel hidden"></div>
+  </main>
+
+  <footer>
+    <button id="build">🏗️ Строить</button>
+    <button id="army">⚔️ Армия</button>
+    <button id="center">🎯 Центр</button>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

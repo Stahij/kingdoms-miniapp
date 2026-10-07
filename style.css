@@ -1,0 +1,15 @@
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#10151a;color:#fff;font-family:Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{height:58px;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#171e24;border-bottom:1px solid #2b353d}
+.title{font-weight:800;letter-spacing:1px}
+.subtitle{font-size:12px;opacity:.65;margin-top:2px}
+header button{border:0;background:#29333b;color:#fff;border-radius:10px;font-size:20px;width:42px;height:42px}
+.resources{height:42px;display:flex;justify-content:space-around;align-items:center;background:#202930;font-size:14px}
+#game{position:relative;flex:1;min-height:0}
+#map{display:block;width:100%;height:100%;touch-action:none}
+.panel{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(20,25,29,.94);border:1px solid #4a5861;border-radius:14px;padding:14px;box-shadow:0 8px 30px #0008}
+.hidden{display:none}
+footer{height:62px;display:flex;gap:8px;padding:8px;background:#171e24;border-top:1px solid #2b353d}
+footer button{flex:1;border:0;border-radius:12px;background:#2a353d;color:#fff;font-weight:700;font-size:13px}
+footer button:active,header button:active{transform:scale(.97)}
