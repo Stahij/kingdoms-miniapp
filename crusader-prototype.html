@@ -61,7 +61,7 @@ let state,selected='hut',rotation=0,speed=1,dayTimer=0,last=0,toastTimer=0,scale
 const initial=()=>({gold:450,wood:120,stone:80,food:90,flour:0,wheat:0,pop:8,free:8,day:1,popularity:50,buildings:[],workers:0,housing:8,foodTypes:1,oxen:0});
 function load(){try{const s=localStorage.getItem('crusaderPrototypeSave');state=s?JSON.parse(s):initial()}catch(e){state=initial()}if(!state.buildings)state.buildings=[];state.housing=Math.max(8,state.housing||8);updateUI()}
 const tile=1, cols=24, rows=24, world=[];
-function iso(x,z){let a=x-12,b=z-12;for(let i=0;i<rotation;i++)[a,b]=[-b,a];return{x:(a-b)*24*scale+canvas.width/2+offsetX,y:(a+b)*12*scale+canvas.height*.43+offsetY}}
+function iso(x,z){let a=x-12,b=z-12;for(let i=0;i<rotation;i++)[a,b]=[-b,a];return{x:(a-b)*24*scale+innerWidth/2+offsetX,y:(a+b)*12*scale+innerHeight*.43+offsetY}}
 function uniso(px,py){let best={x:12,z:12,d:1e9};for(let x=0;x<cols;x++)for(let z=0;z<rows;z++){let p=iso(x,z),d=(p.x-px)**2+(p.y-py)**2;if(d<best.d)best={x,z,d}}return best}
 function rng(x,z){let n=Math.sin(x*127.1+z*311.7)*43758.5453;return n-Math.floor(n)}
 function terrain(x,z){if(x<1||z<1||x>22||z>22)return'sand';if((x-5)**2+(z-5)**2<12)return'water';if((x-17)**2+(z-7)**2<18)return'oasis';if((x-18)**2+(z-17)**2<10)return'iron';if((x-4)**2+(z-18)**2<8)return'rock';return'sand'}
