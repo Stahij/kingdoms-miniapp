@@ -147,22 +147,106 @@ function addLog(text) {
   app.state.log = app.state.log.slice(0, 12);
 }
 
+function readStorage(key) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch (error) {
+    console.warn('Локальное хранилище недоступно:', error);
+    return null;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    console.warn('Не удалось сохранить игру:', error);
+    if (els.menuStatus) {
+      els.menuStatus.textContent = 'Браузер запретил сохранение. Проверьте настройки сайта и свободное место.';
+    }
+    return false;
+  }
+}
+
 function saveGame() {
   if (!app.state) return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(app.state));
+  writeStorage(STORAGE_KEY, JSON.stringify(app.state));
+}
+
+function backupUnreadableSave(raw) {
+  if (!raw) return;
+  // Keep the original data for recovery; never delete it automatically.
+  if (!readStorage(STORAGE_KEY + '-backup')) {
+    writeStorage(STORAGE_KEY + '-backup', raw);
+  }
+}
+
+function normalizeSavedState(parsed) {
+  if (!parsed || typeof parsed !== 'object' ||
+      !parsed.resources || typeof parsed.resources !== 'object' ||
+      !parsed.buildings || typeof parsed.buildings !== 'object' ||
+      !parsed.map || typeof parsed.map !== 'object') {
+    return null;
+  }
+
+  const resourceTypes = new Set(['wood', 'stone', 'food', 'gold']);
+  const resources = {};
+  for (const type of resourceTypes) {
+    const value = Number(parsed.resources[type]);
+    resources[type] = Number.isFinite(value) && value >= 0 ? value : ({ wood: 120, stone: 90, food: 150, gold: 85 }[type]);
+  }
+
+  const map = {};
+  for (let y = 0; y < GRID_SIZE; y += 1) {
+    for (let x = 0; x < GRID_SIZE; x += 1) {
+      const key = `${x}_${y}`;
+      const cell = parsed.map[key];
+      map[key] = {
+        resource: cell && resourceTypes.has(cell.resource) ? cell.resource : null,
+      };
+    }
+  }
+
+  const buildings = {};
+  for (const [key, value] of Object.entries(parsed.buildings)) {
+    if (!/^\\d+_\\d+$/.test(key) || !value || !BUILDINGS[value.type]) continue;
+    const [x, y] = key.split('_').map(Number);
+    if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
+    buildings[key] = { type: value.type, level: Math.max(1, Number(value.level) || 1) };
+  }
+  if (!Object.values(buildings).some((building) => building.type === 'keep')) {
+    buildings['4_4'] = { type: 'keep', level: 1 };
+  }
+
+  const log = Array.isArray(parsed.log)
+    ? parsed.log.filter((line) => typeof line === 'string').slice(0, 12)
+    : ['Сохранение восстановлено с исправлением недостающих данных.'];
+
+  return {
+    rulerName: cleanName(parsed.rulerName),
+    resources,
+    buildings,
+    map,
+    log,
+  };
 }
 
 function loadSavedState() {
+  const raw = readStorage(STORAGE_KEY);
+  if (!raw) return null;
+
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (!parsed || !parsed.resources || !parsed.buildings || !parsed.map) {
+    const normalized = normalizeSavedState(parsed);
+    if (!normalized) {
+      backupUnreadableSave(raw);
       return null;
     }
-    return parsed;
+    return normalized;
   } catch (error) {
     console.warn('Не удалось загрузить сохранение:', error);
+    backupUnreadableSave(raw);
     return null;
   }
 }
@@ -255,6 +339,7 @@ function setStatus(text) {
 }
 
 function renderMap() {
+  if (!app.state || !app.state.buildings || !app.state.map) return;
   els.mapGrid.innerHTML = '';
 
   for (let y = 0; y < GRID_SIZE; y += 1) {
@@ -270,7 +355,7 @@ function renderMap() {
 
       if (building) {
         button.classList.add('occupied');
-        const icon = BUILDINGS[building.type].icon;
+        const icon = BUILDINGS[building.type]?.icon || '🏚️';
         button.textContent = icon;
       } else if (hasResource) {
         const icon = RESOURCE_ICONS[resourceCell.resource];
@@ -373,6 +458,8 @@ function buildBuilding(type, x, y) {
 }
 
 function renderLog() {
+  if (!app.state) return;
+  if (!Array.isArray(app.state.log)) app.state.log = [];
   els.gameLog.innerHTML = '';
   app.state.log.forEach((line) => {
     const item = document.createElement('li');
@@ -382,11 +469,12 @@ function renderLog() {
 }
 
 function renderAll() {
+  if (!app.state || !app.state.resources || !app.state.buildings || !app.state.map) return;
   renderResources();
   renderBuildButtons();
   renderMap();
   renderLog();
-  els.rulerName.textContent = app.state.rulerName;
+  els.rulerName.textContent = cleanName(app.state.rulerName);
 }
 
 function showGame() {
@@ -497,10 +585,22 @@ els.newGameBtn.addEventListener('click', () => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+  els.playerName.value = 'Правитель';
   const saved = loadSavedState();
   if (saved) {
-    els.menuStatus.textContent = 'Есть сохранение. Нажмите «Войти» или «Загрузить сохранение».';
+    // Resume automatically after a browser refresh.
+    app.state = saved;
+    app.selectedType = null;
+    showGame();
+    renderAll();
+    setStatus('Сохранение восстановлено');
+    addLog('Игра автоматически восстановлена после обновления страницы.');
+    saveGame();
+    startProductionTick();
   } else {
-    els.playerName.value = 'Правитель';
+    const raw = readStorage(STORAGE_KEY);
+    els.menuStatus.textContent = raw
+      ? 'Сохранение повреждено или устарело. Исходные данные сохранены в резервной копии; можно начать новую партию.'
+      : 'Создайте новую партию, чтобы начать игру.';
   }
 });
