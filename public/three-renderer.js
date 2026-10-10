@@ -19,7 +19,7 @@ const modelSpecs={wall:'wall-fortified.glb',tower:'tower.glb',towerTop:'tower-to
 if(THREE.GLTFLoader){
  const gltfLoader=new THREE.GLTFLoader();
  Object.keys(modelSpecs).forEach(key=>{
-  gltfLoader.load('assets/kenney/Models/GLB%20format/'+modelSpecs[key],gltf=>{
+  gltfLoader.load(new URL('assets/kenney/Models/GLB%20format/'+modelSpecs[key],document.currentScript?document.currentScript.src:location.href).href,gltf=>{
    modelCache[key]=gltf.scene;
    lastSignature='';
   },undefined,error=>console.warn('Kenney GLB failed:',key,error));
