@@ -27,7 +27,7 @@ function mill(x,z){const g=group(x,z);box(1.2,1.25,1,mats.stone,0,.62,0,g);mesh(
 function farm(x,z){const g=group(x,z);box(1.8,.06,1.4,mats.grass[1],0,.04,0,g);for(let i=0;i<5;i++){const r=box(.055,.07,1.1,mats.gold,-.72+i*.36,.09,0,g);r.rotation.y=.12}}
 function building(b){const x=Number(b.x)||0,z=Number(b.y)||0;switch(b.type){case'keep':keep(x,z,1.12);break;case'fort':keep(x,z,.85);break;case'hut':hut(x,z);break;case'woodcutter':case'quarry':case'mill':case'bakery':case'blacksmith':mill(x,z);break;case'farm':farm(x,z);break;case'barracks':{const g=group(x,z);box(1.6,1,1.2,mats.stone,0,.5,0,g);mesh(new THREE.ConeGeometry(1.15,.65,4),mats.roof,0,1.3,0,g);box(.24,.5,.06,mats.door,0,.25,.63,g);break}case'ox':{const g=group(x,z);mesh(new THREE.BoxGeometry(.75,.45,.35),mats.wood,0,.45,0,g);mesh(new THREE.SphereGeometry(.22,8,6),mats.wood,.4,.65,0,g);for(let i=0;i<4;i++)box(.08,.38,.08,mats.wood,-.25+(i%2)*.5,.19,(i<2?-.12:.12),g);break}}}
 let lastSignature='',tileGroup;
-function rebuild(state,mode,world){while(root.children.length)root.remove(root.children[0])tileGroup=new THREE.Group();root.add(tileGroup);
+function rebuild(state,mode,world){while(root.children.length)root.remove(root.children[0]);tileGroup=new THREE.Group();root.add(tileGroup);
 const half=mode==='world'?19:13;
 for(let x=-half;x<=half;x++)for(let z=-half;z<=half;z++){const v=Math.abs(Math.sin(x*17.3+z*71.7));const tile=mesh(new THREE.BoxGeometry(.98,.09,.98),v>.86?mats.grass[Math.floor(v*10)%3]:mats.sand[Math.floor(v*10)%4],x,-.08,z,tileGroup);tile.receiveShadow=true}
 if(mode!=='world'){for(let x=-4;x<=4;x++)for(let z=-3;z<=3;z++){if(Math.abs(x)>3||Math.abs(z)>2)box(1,.2,1,mats.darkStone,x,.02,z,tileGroup)}}
