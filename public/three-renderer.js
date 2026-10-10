@@ -7,15 +7,15 @@ const mobile=matchMedia('(max-width:800px)').matches;
 const renderer=new THREE.WebGLRenderer({canvas,antialias:!mobile,alpha:false,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.1:1.4));renderer.setSize(innerWidth,innerHeight);
 renderer.shadowMap.enabled=!mobile;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;
-const scene=new THREE.Scene();scene.background=new THREE.Color(0xc1c6a3);scene.fog=new THREE.Fog(0xc1c6a3,35,72);
-const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,160);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.32;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9eaa83);scene.fog=new THREE.Fog(0x9eaa83,48,100);
+const camera=new THREE.PerspectiveCamera(36,innerWidth/innerHeight,.1,160);
 const target=new THREE.Vector3(0,0,0);
-scene.add(new THREE.HemisphereLight(0xf5edcf,0x675640,2.15));
-const sun=new THREE.DirectionalLight(0xffe0ad,2.6);sun.position.set(-12,22,14);sun.castShadow=!mobile;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-25;sun.shadow.camera.right=25;sun.shadow.camera.top=25;sun.shadow.camera.bottom=-25;scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xfff0d2,0x69503a,1.35));
+const sun=new THREE.DirectionalLight(0xffd08a,3.2);sun.position.set(-12,22,14);sun.castShadow=!mobile;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-25;sun.shadow.camera.right=25;sun.shadow.camera.top=25;sun.shadow.camera.bottom=-25;scene.add(sun);
 const root=new THREE.Group();scene.add(root);
 const mat=(color,roughness=1)=>new THREE.MeshStandardMaterial({color,roughness});
-const mats={sand:[0xc7ad78,0xd7bd87,0xcbb07a,0xbfa36d].map(c=>mat(c)),grass:[0x8a965b,0x7e8d50,0x9aa16a].map(c=>mat(c)),stone:mat(0xaaa58f),darkStone:mat(0x777968),wood:mat(0x68472b),roof:mat(0x985b35),roof2:mat(0x77503a),water:mat(0x347e8c,.35),green:[0x496e3c,0x638046,0x7a914d].map(c=>mat(c)),gold:mat(0xd5b66e),door:mat(0x3c2b20),white:mat(0xe2d8bd)};
+const mats={sand:[0xc8a365,0xd7b678,0xc39a5d,0xb58b50].map(c=>mat(c)),grass:[0x8a965b,0x7e8d50,0x9aa16a].map(c=>mat(c)),stone:mat(0xb7b3a4),darkStone:mat(0x6e7068),wood:mat(0x704225),roof:mat(0x9b4f2c),roof2:mat(0x77503a),water:mat(0x347e8c,.35),green:[0x3f6b35,0x547e3d,0x6b8d46].map(c=>mat(c)),gold:mat(0xd5b66e),door:mat(0x3c2b20),white:mat(0xe2d8bd)};
 function mesh(geo,material,x,y,z,parent=root){const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.castShadow=!mobile;m.receiveShadow=true;parent.add(m);return m}
 function box(w,h,d,material,x,y,z,parent=root){return mesh(new THREE.BoxGeometry(w,h,d),material,x,y,z,parent)}
 function group(x,z){const g=new THREE.Group();g.position.set(x,0,z);root.add(g);return g}
@@ -28,8 +28,8 @@ function farm(x,z){const g=group(x,z);box(1.8,.06,1.4,mats.grass[1],0,.04,0,g);f
 function building(b){const x=Number(b.x)||0,z=Number(b.y)||0;switch(b.type){case'keep':keep(x,z,1.12);break;case'fort':keep(x,z,.85);break;case'hut':hut(x,z);break;case'woodcutter':case'quarry':case'mill':case'bakery':case'blacksmith':mill(x,z);break;case'farm':farm(x,z);break;case'barracks':{const g=group(x,z);box(1.6,1,1.2,mats.stone,0,.5,0,g);mesh(new THREE.ConeGeometry(1.15,.65,4),mats.roof,0,1.3,0,g);box(.24,.5,.06,mats.door,0,.25,.63,g);break}case'ox':{const g=group(x,z);mesh(new THREE.BoxGeometry(.75,.45,.35),mats.wood,0,.45,0,g);mesh(new THREE.SphereGeometry(.22,8,6),mats.wood,.4,.65,0,g);for(let i=0;i<4;i++)box(.08,.38,.08,mats.wood,-.25+(i%2)*.5,.19,(i<2?-.12:.12),g);break}}}
 let lastSignature='',tileGroup;
 function rebuild(state,mode,world){while(root.children.length)root.remove(root.children[0]);tileGroup=new THREE.Group();root.add(tileGroup);
-const half=mode==='world'?19:13;
-for(let x=-half;x<=half;x++)for(let z=-half;z<=half;z++){const v=Math.abs(Math.sin(x*17.3+z*71.7));const tile=mesh(new THREE.BoxGeometry(.98,.09,.98),v>.86?mats.grass[Math.floor(v*10)%3]:mats.sand[Math.floor(v*10)%4],x,-.08,z,tileGroup);tile.receiveShadow=true}
+const half=mode==='world'?15:9;
+for(let x=-half;x<=half;x++)for(let z=-half;z<=half;z++){const v=Math.abs(Math.sin(x*17.3+z*71.7));const tile=mesh(new THREE.BoxGeometry(.995,.07,.995),v>.86?mats.grass[Math.floor(v*10)%3]:mats.sand[Math.floor(v*10)%4],x,-.08,z,tileGroup);tile.receiveShadow=true}
 if(mode!=='world'){for(let x=-4;x<=4;x++)for(let z=-3;z<=3;z++){if(Math.abs(x)>3||Math.abs(z)>2)box(1,.2,1,mats.darkStone,x,.02,z,tileGroup)}}
 else{const river=box(2,.015,40,mats.water,3,-.005,0,tileGroup);river.rotation.y=.28}
 if(state&&Array.isArray(state.buildings)){for(const b of state.buildings)building(b)}
@@ -37,7 +37,7 @@ else if(state&&state.buildings&&typeof state.buildings==='object'){for(const [ke
 for(let i=0;i<28;i++){const x=Math.sin(i*41.7)*half*.88,z=Math.cos(i*19.3)*half*.88;tree(x,z,.55+(i%4)*.13)}
 if(mode==='world'&&world){for(const f of (world.forts||[])){const x=Number(f.x)||0,z=Number(f.y)||0;keep(x,z,.65)}}
 }
-function render(state,mode,world,offset,zoom){if(!window.THREE)return;const sig=JSON.stringify([mode,state&&state.buildings,world&&world.forts]);if(sig!==lastSignature){rebuild(state,mode,world);lastSignature=sig}target.set(-(offset?.x||0)*.025,0,-(offset?.y||0)*.025);const dist=22/(zoom||1);camera.position.set(target.x+dist*.78,dist*.92,target.z+dist*.96);camera.lookAt(target);renderer.render(scene,camera)}
+function render(state,mode,world,offset,zoom){if(!window.THREE)return;const sig=JSON.stringify([mode,state&&state.buildings,world&&world.forts]);if(sig!==lastSignature){rebuild(state,mode,world);lastSignature=sig}target.set(-(offset?.x||0)*.012,0,-(offset?.y||0)*.012);const dist=(mode==='world'?28:14)/(zoom||1);camera.position.set(target.x+dist*.76,dist*.92,target.z+dist*.9);camera.lookAt(target);renderer.render(scene,camera)}
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);render(window.__kingdomsState,'castle',{}, {x:0,y:0},1)}
 addEventListener('resize',resize);
 window.Kingdoms3D={render};
