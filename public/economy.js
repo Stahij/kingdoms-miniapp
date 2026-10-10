@@ -32,8 +32,8 @@ window.Economy = (() => {
     for(const b of s.buildings){if(['keep','hut','fort','ox'].includes(b.type)){b.workers=0;continue;}b.workers=assigned<workersAvailable?1:0;if(b.workers)assigned++;}
     const count=t=>s.buildings.filter(b=>b.type===t).length;
     const r=s.resources;
-    if(s.ticks%2===0){r.wood+=count('woodcutter')*2;r.stone+=count('quarry')*count('ox')*1;r.wheat+=count('farm')*2;r.iron+=count('blacksmith')>0?1:0;}
-    if(s.ticks%3===0){const flour=Math.min(r.wheat,count('mill')*2);r.wheat-=flour;r.flour+=flour;const bread=Math.min(r.flour,count('bakery')*2);r.flour-=bread;r.food+=bread*2;}
+    if(s.ticks%2===0){r.wood+=s.buildings.filter(b=>b.type==='woodcutter'&&b.workers>0).length*2;r.stone+=s.buildings.filter(b=>b.type==='quarry'&&b.workers>0).length*count('ox');r.wheat+=s.buildings.filter(b=>b.type==='farm'&&b.workers>0).length*2;r.iron+=s.buildings.filter(b=>b.type==='blacksmith'&&b.workers>0).length;}
+    if(s.ticks%3===0){const flour=Math.min(r.wheat,s.buildings.filter(b=>b.type==='mill'&&b.workers>0).length*2);r.wheat-=flour;r.flour+=flour;const bread=Math.min(r.flour,s.buildings.filter(b=>b.type==='bakery'&&b.workers>0).length*2);r.flour-=bread;r.food+=bread*2;}
     if(s.ticks%5===0){
       const tax=TAX[Math.max(0,Math.min(4,s.tax))], ration=RATIONS[Math.max(0,Math.min(4,s.ration))];
       r.gold=Math.max(0,r.gold+Math.max(0,s.population+tax.gold));
