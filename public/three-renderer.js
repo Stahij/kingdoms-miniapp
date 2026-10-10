@@ -58,5 +58,13 @@ if(mode==='world'&&world){for(const f of (world.forts||[])){const x=Number(f.x)|
 function render(state,mode,world,offset,zoom){if(!window.THREE)return;const sig=JSON.stringify([mode,state&&state.buildings,world&&world.forts]);if(sig!==lastSignature){rebuild(state,mode,world);lastSignature=sig}target.set(-(offset?.x||0)*.012,0,-(offset?.y||0)*.012);const dist=(mode==='world'?28:14)/(zoom||1);camera.position.set(target.x+dist*.76,dist*.92,target.z+dist*.9);camera.lookAt(target);renderer.render(scene,camera)}
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);render(window.__kingdomsState,'castle',{}, {x:0,y:0},1)}
 addEventListener('resize',resize);
-window.Kingdoms3D={render};
+function cellAt(px,py,mode,offset,zoom){
+ const pointer=new THREE.Vector2((px/innerWidth)*2-1,-(py/innerHeight)*2+1);
+ const raycaster=new THREE.Raycaster();raycaster.setFromCamera(pointer,camera);
+ const ground=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+ const hit=new THREE.Vector3();
+ if(!raycaster.ray.intersectPlane(ground,hit))return null;
+ return {x:Math.round(hit.x),y:Math.round(hit.z)};
+}
+window.Kingdoms3D={render,cellAt};
 })();
