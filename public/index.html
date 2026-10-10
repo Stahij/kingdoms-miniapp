@@ -52,6 +52,6 @@
 <script>
 (()=>{const tryLandscape=async()=>{try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();if(screen.orientation&&screen.orientation.lock)await screen.orientation.lock('landscape');}catch(e){/* Браузер может запрещать блокировку ориентации; экран поворачивается вручную. */}};document.addEventListener('pointerdown',tryLandscape,{once:true,passive:true});})();
 </script>
-<script src="/socket.io/socket.io.js"></script><script src="economy.js"></script><script src="game.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script><script src="/socket.io/socket.io.js"></script><script src="economy.js"></script><script src="three-renderer.js"></script><script src="game.js"></script>
 </body>
 </html>
