@@ -14,14 +14,32 @@ const target=new THREE.Vector3(0,0,0);
 scene.add(new THREE.HemisphereLight(0xfff0d2,0x69503a,1.35));
 const sun=new THREE.DirectionalLight(0xffd08a,3.2);sun.position.set(-12,22,14);sun.castShadow=!mobile;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-25;sun.shadow.camera.right=25;sun.shadow.camera.top=25;sun.shadow.camera.bottom=-25;scene.add(sun);
 const root=new THREE.Group();scene.add(root);
+const modelCache={};
+const modelSpecs={wall:'wall-fortified.glb',tower:'tower.glb',towerTop:'tower-top.glb',tree:'tree-large.glb'};
+if(THREE.GLTFLoader){
+ const gltfLoader=new THREE.GLTFLoader();
+ Object.keys(modelSpecs).forEach(key=>{
+  gltfLoader.load('/assets/kenney/Models/GLB%20format/'+modelSpecs[key],gltf=>{
+   modelCache[key]=gltf.scene;
+   lastSignature='';
+  },undefined,error=>console.warn('Kenney GLB failed:',key,error));
+ });
+}
+function addModel(key,x,y,z,scale,parent=root,rotationY=0){
+ if(!modelCache[key])return false;
+ const object=modelCache[key].clone(true);
+ object.position.set(x,y,z);object.scale.setScalar(scale);object.rotation.y=rotationY;
+ object.traverse(child=>{if(child.isMesh){child.castShadow=!mobile;child.receiveShadow=true;}});
+ parent.add(object);return true;
+}
 const mat=(color,roughness=1)=>new THREE.MeshStandardMaterial({color,roughness});
 const mats={sand:[0xc8a365,0xd7b678,0xc39a5d,0xb58b50].map(c=>mat(c)),grass:[0x8a965b,0x7e8d50,0x9aa16a].map(c=>mat(c)),stone:mat(0xb7b3a4),darkStone:mat(0x6e7068),wood:mat(0x704225),roof:mat(0x9b4f2c),roof2:mat(0x77503a),water:mat(0x347e8c,.35),green:[0x3f6b35,0x547e3d,0x6b8d46].map(c=>mat(c)),gold:mat(0xd5b66e),door:mat(0x3c2b20),white:mat(0xe2d8bd)};
 function mesh(geo,material,x,y,z,parent=root){const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.castShadow=!mobile;m.receiveShadow=true;parent.add(m);return m}
 function box(w,h,d,material,x,y,z,parent=root){return mesh(new THREE.BoxGeometry(w,h,d),material,x,y,z,parent)}
 function group(x,z){const g=new THREE.Group();g.position.set(x,0,z);root.add(g);return g}
-function tree(x,z,s=1){const g=group(x,z);mesh(new THREE.CylinderGeometry(.11*s,.16*s,.75*s,7),mats.wood,0,.37*s,0,g);for(let i=0;i<3;i++)mesh(new THREE.ConeGeometry((.58-i*.1)*s,.85*s,7),mats.green[i],0,(.8+i*.43)*s,0,g)}
+function tree(x,z,s=1){if(addModel('tree',x,0,z,s))return;const g=group(x,z);mesh(new THREE.CylinderGeometry(.11*s,.16*s,.75*s,7),mats.wood,0,.37*s,0,g);for(let i=0;i<3;i++)mesh(new THREE.ConeGeometry((.58-i*.1)*s,.85*s,7),mats.green[i],0,(.8+i*.43)*s,0,g)}
 function tower(g,x,z,s=1){box(.9*s,1.6*s,.9*s,mats.stone,x,.8*s,z,g);box(.94*s,.14*s,.94*s,mats.darkStone,x,1.65*s,z,g);for(let i=0;i<4;i++)box(.17*s,.26*s,.2*s,mats.white,x-.34*s+i*.22*s,1.84*s,z,g);box(.19*s,.48*s,.08*s,mats.door,x,.25*s,z+.47*s,g);box(.98*s,.12*s,.98*s,mats.darkStone,x,1.48*s,z,g)}
-function keep(x,z,s=1){const g=group(x,z);box(2.3*s,1.5*s,2*s,mats.stone,0,.75*s,0,g);box(2.38*s,.13*s,2.08*s,mats.darkStone,0,1.52*s,0,g);box(.6*s,2.4*s,.6*s,mats.stone,0,1.2*s,-.05*s,g);box(.68*s,.14*s,.68*s,mats.darkStone,0,2.4*s,-.05*s,g);mesh(new THREE.ConeGeometry(.56*s,.7*s,4),mats.roof,0,2.82*s,-.05*s,g);box(.3*s,.65*s,.09*s,mats.door,0,.33*s,1.02*s,g);for(const [tx,tz] of [[-1,-.8],[1,-.8],[-1,.8],[1,.8]])tower(g,tx,tz,.65*s)}
+function keep(x,z,s=1){const g=group(x,z);box(2.3*s,1.5*s,2*s,mats.stone,0,.75*s,0,g);box(2.38*s,.13*s,2.08*s,mats.darkStone,0,1.52*s,0,g);box(.6*s,2.4*s,.6*s,mats.stone,0,1.2*s,-.05*s,g);box(.68*s,.14*s,.68*s,mats.darkStone,0,2.4*s,-.05*s,g);mesh(new THREE.ConeGeometry(.56*s,.7*s,4),mats.roof,0,2.82*s,-.05*s,g);box(.3*s,.65*s,.09*s,mats.door,0,.33*s,1.02*s,g);for(const [tx,tz] of [[-1,-.8],[1,-.8],[-1,.8],[1,.8]]){if(!addModel('tower',tx*s,0,tz*s,.65*s,g))tower(g,tx,tz,.65*s)}for(let i=-1;i<=1;i++){addModel('wall',i*.72*s,0,-1.25*s,.65*s,g);addModel('wall',i*.72*s,0,1.25*s,.65*s,g,Math.PI);addModel('wall',-1.25*s,0,i*.72*s,.65*s,g,-Math.PI/2);addModel('wall',1.25*s,0,i*.72*s,.65*s,g,Math.PI/2)}}
 function hut(x,z){const g=group(x,z);box(1.15,.82,.9,mats.wood,0,.41,0,g);box(.08,.65,.08,mats.stone,-.44,.35,.48,g);box(.08,.65,.08,mats.stone,.44,.35,.48,g);mesh(new THREE.ConeGeometry(.92,.7,4),mats.roof,0,1.13,0,g).rotation.y=Math.PI/4;box(.2,.42,.05,mats.door,0,.21,.47,g);box(.13,.18,.06,mats.white,-.28,.55,.47,g)}
 function mill(x,z){const g=group(x,z);box(1.2,1.25,1,mats.stone,0,.62,0,g);mesh(new THREE.ConeGeometry(.9,.65,4),mats.roof,0,1.55,0,g).rotation.y=Math.PI/4;box(.16,.5,.07,mats.door,0,.25,.52,g);box(.05,1.8,.05,mats.wood,.3,1.4,-.55,g);box(.05,1.8,.05,mats.wood,-.3,1.4,-.55,g)}
 function farm(x,z){const g=group(x,z);box(1.8,.06,1.4,mats.grass[1],0,.04,0,g);for(let i=0;i<5;i++){const r=box(.055,.07,1.1,mats.gold,-.72+i*.36,.09,0,g);r.rotation.y=.12}}
