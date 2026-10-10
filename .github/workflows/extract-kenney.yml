@@ -10,21 +10,28 @@ jobs:
   extract:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repository history
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Check archive
+      - name: Restore uploaded archive
         run: |
-          test -f kenney_retro-medieval-kit.zip || {
-            echo "Archive kenney_retro-medieval-kit.zip was not found in the repository root."
-            exit 1
-          }
+          ARCHIVE_COMMIT="e73be718456a97fb81002d3e959f360822e61d75"
+          if [ ! -f kenney_retro-medieval-kit.zip ]; then
+            git fetch origin "$ARCHIVE_COMMIT"
+            git show "$ARCHIVE_COMMIT:kenney_retro-medieval-kit.zip" > /tmp/kenney_retro-medieval-kit.zip
+            echo "Restored archive from the earlier upload commit."
+          else
+            cp kenney_retro-medieval-kit.zip /tmp/kenney_retro-medieval-kit.zip
+          fi
+          unzip -t /tmp/kenney_retro-medieval-kit.zip
           command -v unzip
 
       - name: Extract assets
         run: |
           mkdir -p public/assets/kenney
-          unzip -o kenney_retro-medieval-kit.zip -d public/assets/kenney
+          unzip -o /tmp/kenney_retro-medieval-kit.zip -d public/assets/kenney
           echo "Extracted file count:"
           find public/assets/kenney -type f | wc -l
           echo "Sample files:"
@@ -40,4 +47,4 @@ jobs:
             exit 0
           fi
           git commit -m "Extract Kenney medieval assets"
-          git push
+          git push origin HEAD:main
