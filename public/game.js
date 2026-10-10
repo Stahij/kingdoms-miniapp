@@ -146,7 +146,7 @@ buildMenuBtn.addEventListener('click',()=>toggleBuildMenu(!buildsMenu.classList.
 $('closeBuildMenu').addEventListener('click',()=>toggleBuildMenu(false));
 ownershipBtn.addEventListener('click',()=>{const open=ownershipPanel.style.display!=='block';ownershipPanel.style.display=open?'block':'none';ownershipBtn.setAttribute('aria-expanded',String(open));});
 document.querySelectorAll('[data-build]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.build)));
-function cellAt(px,py){const cx=innerWidth*.54+offset.x,cy=innerHeight*.48+offset.y,s=zoom*28;const dx=(px-cx)/s,dy=(py-cy)/(s*.48);return {x:Math.round((dx+dy)/2),y:Math.round((dy-dx)/2)};}
+function cellAt(px,py){if(window.Kingdoms3D&&typeof window.Kingdoms3D.cellAt==='function'){const cell=window.Kingdoms3D.cellAt(px,py,mode,offset,zoom);if(cell)return cell;}const cx=innerWidth*.54+offset.x,cy=innerHeight*.48+offset.y,s=zoom*28;const dx=(px-cx)/s,dy=(py-cy)/(s*.48);return {x:Math.round((dx+dy)/2),y:Math.round((dy-dx)/2)};}
 function tap(px,py){
  if(mode==='castle'){
   const c=cellAt(px,py);if(!selected){toast('Выбери постройку на панели снизу.');return;}
