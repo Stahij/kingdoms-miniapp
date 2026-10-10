@@ -1,0 +1,16 @@
+{
+  "name": "kingdoms-crusader-world",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stronghold-inspired castle economy and alliance world-map strategy prototype",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  }
+}
