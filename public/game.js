@@ -6,7 +6,7 @@ const STORE='kingdoms-crusader-save-v1';
 let state=load(),mode='castle',selected=null,offset={x:0,y:0},zoom=1,drag=null,lastPinch=0,world={players:[],alliances:[],marches:[],forts:[]},socket=null,player=null,alliance=null;
 const COLORS={sand:'#c5a66b',light:'#e2ca91',stone:'#a89a7b',shadow:'#66543b',wood:'#70502e',green:'#7b8548',water:'#3e8491'};
 const TYPES={keep:'Замок',hut:'Хижина',woodcutter:'Лесопилка',farm:'Ферма',mill:'Мельница',bakery:'Пекарня',quarry:'Каменоломня',ox:'Волы',blacksmith:'Кузница',barracks:'Казармы',fort:'Форт'};
-function load(){try{const x=JSON.parse(localStorage.getItem(STORE));if(x&&x.buildings&&x.resources)return x;}catch(e){}return Economy.initial();}
+function load(){try{const x=JSON.parse(localStorage.getItem(STORE));if(x&&x.buildings&&x.resources){let changed=false;for(const b of x.buildings){if(b.type==='hut'&&b.x===-3&&b.y===1){b.x=-5;b.y=1;changed=true;}}if(changed){try{localStorage.setItem(STORE,JSON.stringify(x));}catch(e){}}return x;}}catch(e){}return Economy.initial();}
 function save(){localStorage.setItem(STORE,JSON.stringify(state));toast('Сохранение записано на этом устройстве.');}
 function toast(s){const el=$('toast');el.textContent=s;el.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display='none',2600);}
 function resize(){const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.floor(innerWidth*d);canvas.height=Math.floor(innerHeight*d);canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);draw();}
@@ -149,6 +149,7 @@ function tap(px,py){
  if(mode==='castle'){
   const c=cellAt(px,py);if(!selected){toast('Выбери постройку на панели снизу.');return;}
   if(Math.abs(c.x)>7||Math.abs(c.y)>7){toast('Строить можно в пределах владения.');return;}
+  if(c.x>=-3&&c.x<=3&&c.y>=-2&&c.y<=2){toast('Внутри крепости здания не строятся. Размещай их снаружи стен.');return;}
   const result=Economy.build(state,selected,c.x,c.y);toast(result.message);if(result.ok){selected=null;toggleBuildMenu(false);saveSilent();updateHUD();draw();}return;
  }
  const c=cellAt(px,py);
