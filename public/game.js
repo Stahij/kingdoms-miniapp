@@ -129,10 +129,11 @@ $('allianceBtn').onclick=()=>{
  let body='<p>'+(online?'Онлайн-сервер подключён.':'Сервер не подключён. Создание альянса будет доступно после запуска Node.js сервера.')+'</p>';
  body+='<label>Имя правителя</label><input id="playerName" maxlength="20" placeholder="Лорд пустыни" value="'+(player?.name||'Лорд пустыни')+'">';
  body+='<label>Название альянса</label><input id="allianceName" maxlength="28" placeholder="Орден Пустыни"><label>Тег (2–5 знаков)</label><input id="allianceTag" maxlength="5" placeholder="DES">';
- body+='<div class="log" id="allianceList"></div>';
- showModal('Альянс и дипломатия',body,[{label:'Войти',run:()=>{if(!socket?.connected){toast('Сервер не подключён.');return;}socket.emit('player:join',{name:$('playerName').value});closeModal();}},{label:'Создать альянс',run:()=>{if(!socket?.connected){toast('Сервер не подключён.');return;}socket.emit('alliance:create',{name:$('allianceName').value,tag:$('allianceTag').value});}},{label:'Закрыть',run:closeModal}]);
+ body+='<div class="log" id="allianceList"></div><p><b>Чат альянса</b></p><div class="log" id="allianceChatLog" style="min-height:45px"></div><input id="allianceChatInput" maxlength="240" placeholder="Сообщение альянсу">';
+ showModal('Альянс и дипломатия',body,[{label:'Войти',run:()=>{if(!socket?.connected){toast('Сервер не подключён.');return;}socket.emit('player:join',{name:$('playerName').value});closeModal();}},{label:'Создать альянс',run:()=>{if(!socket?.connected){toast('Сервер не подключён.');return;}if(!player)socket.emit('player:join',{name:$('playerName').value});socket.emit('alliance:create',{name:$('allianceName').value,tag:$('allianceTag').value});}},{label:'Отправить в чат',run:()=>{const input=$('allianceChatInput');if(!socket?.connected){toast('Сервер не подключён.');return;}socket.emit('alliance:chat',{text:input.value});input.value='';}},{label:'Закрыть',run:closeModal}]);
  renderAllianceList();
 };
+function appendChat(name,message){const el=$('allianceChatLog');if(!el)return;const row=document.createElement('div');row.textContent='['+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'] '+name+': '+message;el.prepend(row);}
 function renderAllianceList(){const el=$('allianceList');if(!el)return;el.innerHTML='<p><b>Доступные альянсы</b></p>'+world.alliances.map(a=>'<div>'+escapeHTML('['+a.tag+'] '+a.name+' · '+a.members+' участн.')+' <button data-join="'+a.id+'">Вступить</button></div>').join('');el.querySelectorAll('[data-join]').forEach(b=>b.onclick=()=>{if(socket?.connected)socket.emit('alliance:join',{id:b.dataset.join});else toast('Сервер не подключён.');});}
 function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 if(typeof window.io==='function'){
@@ -144,7 +145,8 @@ if(typeof window.io==='function'){
  socket.on('player:ready',p=>{player=p;toast('Добро пожаловать, '+p.name+'!');});
  socket.on('alliance:joined',d=>{alliance=d.alliance;state.allianceId=d.alliance.id;saveSilent();toast('Вы в альянсе ['+d.alliance.tag+'].');renderAllianceList();});
  socket.on('alliance:left',()=>{alliance=null;state.allianceId=null;saveSilent();toast('Вы покинули альянс.');});
- socket.on('alliance:notice',d=>toast(d.text));
+ socket.on('alliance:notice',d=>{toast(d.text);appendChat('СИСТЕМА',d.text);});
+ socket.on('alliance:chat',d=>appendChat(d.name,d.text));
  socket.on('game:error',d=>toast(d.message));
  socket.on('march:update',m=>{if(m.ownerId===player?.id)toast(m.status==='arrived'?'Марш прибыл к цели.':'Армия выступила в поход.');});
 }else{
