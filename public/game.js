@@ -138,13 +138,18 @@ function updateHUD(){
  document.querySelectorAll('[data-build]').forEach(b=>b.classList.toggle('active',selected===b.dataset.build));
 }
 function choose(type){selected=selected===type?null:type;updateHUD();toast(selected?'Выбрано: '+Economy.LABELS[selected]:'Выбор отменён.');}
+const buildsMenu=$('builds'), buildMenuBtn=$('buildMenuBtn'), ownershipBtn=$('ownershipBtn'), ownershipPanel=document.querySelector('.left');
+function toggleBuildMenu(open){buildsMenu.classList.toggle('open',open);buildMenuBtn.setAttribute('aria-expanded',String(open));}
+buildMenuBtn.addEventListener('click',()=>toggleBuildMenu(!buildsMenu.classList.contains('open')));
+$('closeBuildMenu').addEventListener('click',()=>toggleBuildMenu(false));
+ownershipBtn.addEventListener('click',()=>{const open=ownershipPanel.style.display!=='block';ownershipPanel.style.display=open?'block':'none';ownershipBtn.setAttribute('aria-expanded',String(open));});
 document.querySelectorAll('[data-build]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.build)));
 function cellAt(px,py){const cx=innerWidth*.54+offset.x,cy=innerHeight*.48+offset.y,s=zoom*28;const dx=(px-cx)/s,dy=(py-cy)/(s*.48);return {x:Math.round((dx+dy)/2),y:Math.round((dy-dx)/2)};}
 function tap(px,py){
  if(mode==='castle'){
   const c=cellAt(px,py);if(!selected){toast('Выбери постройку на панели снизу.');return;}
   if(Math.abs(c.x)>7||Math.abs(c.y)>7){toast('Строить можно в пределах владения.');return;}
-  const result=Economy.build(state,selected,c.x,c.y);toast(result.message);if(result.ok){selected=null;saveSilent();updateHUD();draw();}return;
+  const result=Economy.build(state,selected,c.x,c.y);toast(result.message);if(result.ok){selected=null;toggleBuildMenu(false);saveSilent();updateHUD();draw();}return;
  }
  const c=cellAt(px,py);
  if(selected==='fort'){if(!alliance){toast('Сначала вступи или создай альянс.');return;}if(socket?.connected)socket.emit('fort:build',c);else toast('Для онлайн-форта нужен запущенный сервер.');selected=null;return;}
