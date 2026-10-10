@@ -1,79 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#171b18" />
-    <title>KINGDOMS</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="app">
-      <section id="menuScreen" class="screen">
-        <div class="panel">
-          <p class="eyebrow">KINGDOMS</p>
-          <h1>Мини-игра</h1>
-          <p class="subtitle">Одиночный режим без Firebase. Строй поселение, добывай ресурсы и развивай крепость.</p>
-
-          <label class="field-label" for="playerName">Имя правителя</label>
-          <input id="playerName" type="text" maxlength="20" placeholder="Например: Артур" />
-
-          <div class="menu-actions">
-            <button id="createGameBtn" class="primary-btn">Создать партию</button>
-            <button id="enterGameBtn" class="secondary-btn">Войти</button>
-          </div>
-
-          <button id="loadSaveBtn" class="ghost-btn">Загрузить сохранение</button>
-          <p id="menuStatus" class="status" aria-live="polite"></p>
-        </div>
-      </section>
-
-      <section id="gameScreen" class="screen hidden">
-        <header class="topbar panel">
-          <div>
-            <span class="eyebrow small">Правитель</span>
-            <h2 id="rulerName">Правитель</h2>
-          </div>
-          <button id="backToMenuBtn" class="ghost-btn">В меню</button>
-        </header>
-
-        <section class="hud panel">
-          <div class="resource-row">
-            <div class="resource-card wood"><span>🪵</span><strong id="woodValue">0</strong><small>Дерево</small></div>
-            <div class="resource-card stone"><span>🪨</span><strong id="stoneValue">0</strong><small>Камень</small></div>
-            <div class="resource-card food"><span>🌾</span><strong id="foodValue">0</strong><small>Еда</small></div>
-            <div class="resource-card gold"><span>🪙</span><strong id="goldValue">0</strong><small>Золото</small></div>
-          </div>
-        </section>
-
-        <main class="game-layout">
-          <aside class="panel build-panel">
-            <h3>Постройки</h3>
-            <div id="buildingsList" class="buildings-list"></div>
-            <div class="action-row">
-              <button id="harvestBtn" class="primary-btn">Собрать ресурсы</button>
-            </div>
-            <div class="action-row compact">
-              <button id="newGameBtn" class="secondary-btn">Новая игра</button>
-            </div>
-          </aside>
-
-          <section class="panel map-panel">
-            <div class="map-header">
-              <h3>Поселение</h3>
-              <span id="statusText" class="status-chip">Готово</span>
-            </div>
-            <div id="mapGrid" class="map-grid" aria-label="Игровое поле"></div>
-          </section>
-        </main>
-
-        <section class="panel log-panel">
-          <h3>Журнал</h3>
-          <ul id="gameLog" class="game-log"></ul>
-        </section>
-      </section>
-    </div>
-
-    <script src="game.js"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta http-equiv="refresh" content="0;url=public/index.html">
+<title>Kingdoms — Crusader World</title>
+<style>body{margin:0;background:#171b18;color:#f6ecd3;font:16px system-ui;display:grid;min-height:100vh;place-items:center}a{color:#e7c577}</style>
+</head>
+<body><p>Открываем игру… Если переход не сработал, <a href="public/index.html">нажми здесь</a>.</p><script>location.replace('public/index.html');</script></body>
 </html>
