@@ -128,7 +128,7 @@ function worldScene(){const s=zoom;const bg=ctx.createLinearGradient(0,0,0,inner
  text('КАРТА МИРА · координаты ±500',innerWidth/2,innerHeight-92,12,'#3b3523');
 }
 function drawIcon(x,y,icon,size){ctx.font=size+'px serif';ctx.textAlign='center';ctx.fillText(icon,x,y);}
-function draw(){if(!ctx)return;ctx.clearRect(0,0,innerWidth,innerHeight);if(mode==='castle')castleScene();else worldScene();}
+function draw(){if(!ctx)return;ctx.clearRect(0,0,innerWidth,innerHeight);window.__kingdomsState=state;if(window.Kingdoms3D){window.Kingdoms3D.render(state,mode,world,offset,zoom);return;}if(mode==='castle')castleScene();else worldScene();}
 function updateHUD(){
  const r=state.resources;for(const k of ['wood','stone','food','gold'])$(k).textContent=Math.floor(r[k]||0);
  $('pop').textContent=state.popularity;$('popBar').style.width=state.popularity+'%';$('people').textContent=state.population+' / '+(8+state.buildings.filter(b=>b.type==='hut').length*8);
