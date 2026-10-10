@@ -2,7 +2,9 @@
 (() => {
 const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
 const $=id=>document.getElementById(id);
-const STORE='kingdoms-crusader-save-v1';
+const OLD_STORE='kingdoms-crusader-save-v1';
+const STORE='kingdoms-crusader-save-v2';
+try{localStorage.removeItem(OLD_STORE);}catch(e){}
 let state=load(),mode='castle',selected=null,offset={x:0,y:0},zoom=1,drag=null,lastPinch=0,world={players:[],alliances:[],marches:[],forts:[]},socket=null,player=null,alliance=null;
 const COLORS={sand:'#c5a66b',light:'#e2ca91',stone:'#a89a7b',shadow:'#66543b',wood:'#70502e',green:'#7b8548',water:'#3e8491'};
 const TYPES={keep:'Замок',hut:'Хижина',woodcutter:'Лесопилка',farm:'Ферма',mill:'Мельница',bakery:'Пекарня',quarry:'Каменоломня',ox:'Волы',blacksmith:'Кузница',barracks:'Казармы',fort:'Форт'};
