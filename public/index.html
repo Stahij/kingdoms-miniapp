@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#171b18">
+<title>Kingdoms — Crusader World</title>
+<style>
+:root{color-scheme:dark;--gold:#e7c577;--panel:#171d1bef;--line:#8e7549;--ink:#f6ecd3;--muted:#c7c0aa}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#1a211b;color:var(--ink);font:14px system-ui,-apple-system,Segoe UI,sans-serif}button,input{font:inherit}button{cursor:pointer;color:var(--ink);background:linear-gradient(#343b30,#20251f);border:1px solid #947c4c;border-radius:8px;padding:8px 10px}button:active{transform:translateY(1px)}button:disabled{opacity:.45;cursor:not-allowed}
+#scene{position:fixed;inset:0;width:100%;height:100%;touch-action:none;background:#bba06a}
+.top{position:fixed;z-index:3;top:8px;left:8px;right:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px;background:#121a17ed;border:1px solid var(--line);border-radius:12px;box-shadow:0 5px 18px #0007}.brand{font-weight:950;letter-spacing:.08em;color:var(--gold);margin-right:auto}.res{background:#0c120f;border:1px solid #5f634a;border-radius:7px;padding:5px 8px;white-space:nowrap;font-size:12px}.res b{color:#f1d58d}.top button{padding:7px 9px;font-size:12px}.top button.active,.build.active{background:linear-gradient(#e6c16b,#a8792f);color:#241d10}
+.panel{position:fixed;z-index:3;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 5px 18px #0008;backdrop-filter:blur(8px)}.left{top:100px;left:8px;width:166px;padding:10px;max-height:calc(100dvh - 194px);overflow:auto}.panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--gold);margin:0 0 8px}.stat{display:flex;justify-content:space-between;gap:8px;margin:5px 0;font-size:12px}.stat b{color:#f4dfa4}.meter{height:6px;background:#3a3b2c;border-radius:8px;overflow:hidden;margin:5px 0 9px}.meter i{display:block;height:100%;background:#c3a05b;width:50%}.builds{position:fixed;z-index:4;bottom:8px;left:8px;right:8px;display:flex;gap:6px;overflow-x:auto;padding:8px;background:#121a17f2;border:1px solid var(--line);border-radius:12px}.build{flex:0 0 86px;min-height:65px;font-size:11px;padding:6px 4px}.build span{display:block;font-size:21px;margin-bottom:3px}.build small{color:#e8cd8b;display:block;margin-top:3px}.hint{position:fixed;z-index:3;right:10px;top:100px;max-width:180px;padding:9px;background:#121a17dd;border:1px solid #6e6548;border-radius:9px;color:var(--muted);font-size:11px}.toast{position:fixed;z-index:8;left:50%;top:72px;transform:translateX(-50%);background:#101713f5;border:1px solid var(--gold);border-radius:9px;padding:10px 14px;max-width:90vw;text-align:center;display:none}.modal{position:fixed;z-index:7;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.dialog{width:min(440px,100%);max-height:85dvh;overflow:auto;padding:16px;background:#19211b;border:1px solid var(--gold);border-radius:14px}.dialog h2{margin:0 0 10px;color:var(--gold)}.dialog p{color:var(--muted);font-size:13px}.dialog input{width:100%;padding:10px;background:#0e1411;border:1px solid #746342;border-radius:8px;color:var(--ink);margin:5px 0 10px}.dialog .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.log{font-size:12px;line-height:1.45;max-height:180px;overflow:auto}.log div{border-bottom:1px solid #3b4031;padding:5px 0}.hidden{display:none!important}
+@media(max-width:600px){.top{gap:4px;padding:6px}.brand{width:100%;font-size:12px}.res{padding:4px 6px;font-size:11px}.left{top:130px;width:145px}.hint{top:130px;max-width:135px}.builds{gap:5px}.build{flex-basis:78px}.top button{padding:6px 7px}}
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="Игровая карта"></canvas>
+<header class="top">
+  <div class="brand">⚔ KINGDOMS: CRUSADER</div>
+  <div class="res">🪵 <b id="wood">120</b></div><div class="res">🪨 <b id="stone">90</b></div><div class="res">🌾 <b id="food">100</b></div><div class="res">🪙 <b id="gold">250</b></div>
+  <button id="skirmishBtn" class="active">🏰 Замок</button><button id="worldBtn">🌍 Карта мира</button><button id="allianceBtn">🛡 Альянс</button><button id="saveBtn">💾</button>
+</header>
+<aside class="panel left">
+  <h3 id="modeTitle">Моё владение</h3>
+  <div class="stat"><span>Популярность</span><b id="pop">65</b></div><div class="meter"><i id="popBar"></i></div>
+  <div class="stat"><span>Население</span><b id="people">8 / 16</b></div>
+  <div class="stat"><span>Налог</span><b id="taxLabel">Обычный</b></div>
+  <div class="stat"><span>Рацион</span><b id="rationLabel">Обычный</b></div>
+  <div class="stat"><span>Рабочие</span><b id="workers">2</b></div>
+  <hr style="border-color:#4b4b37">
+  <button id="taxBtn" style="width:100%;margin-bottom:5px">Изменить налог</button><button id="rationBtn" style="width:100%;margin-bottom:5px">Изменить рацион</button><button id="tradeBtn" style="width:100%">Рынок: продать дерево</button>
+  <p style="font-size:10px;color:#aaa78f;margin:8px 0 0">Выбери постройку снизу и коснись свободного места.</p>
+</aside>
+<div class="hint" id="hint">Построй лесопилку и ферму. Перетаскивай карту одним пальцем, масштабируй двумя.</div>
+<nav class="builds" id="builds">
+ <button class="build" data-build="hut"><span>🛖</span>Хижина<small>35 🪵</small></button>
+ <button class="build" data-build="woodcutter"><span>🪓</span>Лесопилка<small>30 🪵</small></button>
+ <button class="build" data-build="farm"><span>🌾</span>Ферма<small>25 🪵</small></button>
+ <button class="build" data-build="mill"><span>⚙️</span>Мельница<small>40 🪵 · 10 🪨</small></button>
+ <button class="build" data-build="bakery"><span>🥖</span>Пекарня<small>25 🪵 · 10 🪨</small></button>
+ <button class="build" data-build="quarry"><span>⛏️</span>Каменоломня<small>35 🪵</small></button>
+ <button class="build" data-build="ox"><span>🐂</span>Волы<small>20 🪵</small></button>
+ <button class="build" data-build="blacksmith"><span>⚒️</span>Кузница<small>35 🪵 · 20 🪨</small></button>
+ <button class="build" data-build="barracks"><span>🛡️</span>Казармы<small>50 🪵 · 35 🪨</small></button>
+ <button class="build" data-build="fort"><span>🏰</span>Форт альянса<small>100 🪵 · 100 🪨</small></button>
+</nav>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="dialog"><h2 id="modalTitle">Альянс</h2><div id="modalBody"></div><div class="actions" id="modalActions"></div></div></div>
+<script src="/socket.io/socket.io.js"></script><script src="economy.js"></script><script src="game.js"></script>
+</body>
+</html>
