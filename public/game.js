@@ -150,8 +150,13 @@ function cellAt(px,py){if(window.Kingdoms3D&&typeof window.Kingdoms3D.cellAt==='
 function tap(px,py){
  if(mode==='castle'){
   const c=cellAt(px,py);if(!selected){toast('Выбери постройку на панели снизу.');return;}
-  if(Math.abs(c.x)>7||Math.abs(c.y)>7){toast('Строить можно в пределах владения.');return;}
-  if(c.x>=-3&&c.x<=3&&c.y>=-2&&c.y<=2){toast('Внутри крепости здания не строятся. Размещай их снаружи стен.');return;}
+  if(Math.abs(c.x)>15||Math.abs(c.y)>15){toast('Слишком далеко от владения. Перемести карту ближе.');return;}
+  // Keep the entire building footprint clear of the fortification ring.
+  const nearHorizontalWall=Math.abs(Math.abs(c.y)-4.5)<1.05&&Math.abs(c.x)<5.9;
+  const nearVerticalWall=Math.abs(Math.abs(c.x)-5)<1.05&&Math.abs(c.y)<4.2;
+  const insideKeep=c.x>=-3.4&&c.x<=3.4&&c.y>=-3.2&&c.y<=3.2;
+  if(nearHorizontalWall||nearVerticalWall){toast('Здесь проходят стены или башни. Отступи на соседнюю клетку.');return;}
+  if(insideKeep){toast('Внутри крепости здания не строятся. Размещай их снаружи стен.');return;}
   const result=Economy.build(state,selected,c.x,c.y);toast(result.message);if(result.ok){selected=null;toggleBuildMenu(false);saveSilent();updateHUD();draw();}return;
  }
  const c=cellAt(px,py);
